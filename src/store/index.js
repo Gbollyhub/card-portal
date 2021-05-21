@@ -139,7 +139,8 @@ export default createStore({
     },
 
       attemptLogin (context,payload){
-         return axios.get(process.env.VUE_APP_CardPortalSecurityApi_URL + '/api/companyusers',
+         return axios.post(process.env.VUE_APP_CardPortalSecurityApi_URL + '/api/Login/companylogin',
+             payload,
               {
                   headers: {
                       "Content-Type": "application/json"
