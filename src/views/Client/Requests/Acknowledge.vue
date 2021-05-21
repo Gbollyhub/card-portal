@@ -1,21 +1,23 @@
 <template>
   <div>
-     <Loader v-show="loader"/>
-     <Status :state="state" :closeModal = "closeAddReload" :message = "message" :resetState="resetState" v-if="status"/>
- <div class="content-header">Card Requests</div>
-      <div class="content-sub">Here are the latest report on Paysure Agency</div>
+      <Loader v-show="loader"/>
+     <Status :state="state" :message = "message" :resetState="resetState" v-if="status"/>
+ <div class="content-header">Pending Card Requests Acknowledgements</div>
+      <div class="content-sub">Here are the requests that need acknowledgements</div>
       <div class="app-table-actions">
         <div class="app-table-search">
           <div class="form-block w-form">
             <form id="email-form" name="email-form" data-name="Email Form"><input type="text" class="app-input-search w-input" maxlength="256" name="name" data-name="Name" placeholder="Search..." id="name"></form>
           </div>
         </div>
-        <div class="app-table-buttons">
+        <!-- <div class="app-table-buttons">
           <a href="#" class="table-button">Sort <span class="table-button-icon"></span></a>
           <a href="#" class="table-button">Filter <span class="table-button-icon"></span></a>
           <a href="#" class="table-button">Actions <span class="table-button-icon"></span></a>
-        </div>
+        </div> -->
       </div>
+                 <Loading v-if="AcknowledgeLoader"/>
+           <div v-else>
       <table class="app-table2" v-if="!AcknowledgeRequests.length <= 0">
                     <thead>
                         <tr class="app-table2-row">
@@ -49,6 +51,7 @@
           
                 </table>
                  <EmptyData v-else/>
+           </div>
   </div>
 </template>
 
@@ -60,7 +63,7 @@ import {mapGetters} from 'vuex'
 import EmptyData from '../../../components/EmptyData/EmptyData'
 import Loading from '../../../components/Loading/Loading'
 export default {
-  props:['AcknowledgeRequests'],
+  props:['AcknowledgeRequests','AcknowledgeLoader'],
           components:{
      Loader,
      Status,
@@ -81,17 +84,23 @@ export default {
     ])
   },
   methods: {
+         resetState(){
+this.status = false;
+              location.reload();
+         return false; 
+    },
   async  Acknowledge(result){
        this.loader = true
+        const user = JSON.parse(localStorage.getItem("user-mfb"))
          const formData = {
               "requestId": [result.id],
-              "companyId": 0,
-              "workflowId": 6,
-              "userId": 0
+              "companyId": parseInt(user.companyId),
+              "workflowId": 2,
+              "userId": parseInt(user.id)
             }
          try {
            
-             const response = await axios.post(this.getUrl + 'api/CardRequest/approveoracknowledge',formData)
+             const response = await axios.post(this.getUrl2 + 'api/CardRequest/approveoracknowledge',formData)
              if(response.status == 200){
                this.loader = false;
                this.status = true;

@@ -2,12 +2,14 @@
   <div>
        <Loader v-show="loader"/>
      <Status :state="state"  :message = "message" :resetState="resetState" v-if="status"/>
- <div class="content-header">Pending Card Requests Approval</div>
-      <div class="content-sub">Here are the requests that need approval</div>
+ <div class="content-header">Card Status</div>
+      <div class="content-sub">Check the status of a card</div>
       <div class="app-table-actions">
         <div class="app-table-search">
           <div class="form-block w-form">
-            <form id="email-form" name="email-form" data-name="Email Form"><input type="text" class="app-input-search w-input" maxlength="256" name="name" data-name="Name" placeholder="Search..." id="name"></form>
+            <form>
+            <input type="text" class="app-input-search w-input" placeholder="Search by Account Number...">
+            </form>
           </div>
         </div>
         <!-- <div class="app-table-buttons">
@@ -16,9 +18,9 @@
           <a href="#" class="table-button">Actions <span class="table-button-icon"></span></a>
         </div> -->
       </div>
-           <Loading v-if="approvalLoader"/>
+           <Loading v-if="loading"/>
            <div v-else>
-                     <table class="app-table2" v-if="!ApprovalRequests.length <= 0">
+                     <table class="app-table2" v-if="!testData.length <= 0">
                     <thead>
                         <tr class="app-table2-row">
                            <th class="app-table2-header">Id</th>
@@ -34,16 +36,16 @@
                     </thead>
             
                         <tbody>
-                              <tr v-for="(result, index) in ApprovalRequests" :key="index" class="app-table2-row">
+                              <tr v-for="(result, index) in testData" :key="index" class="app-table2-row">
                             <td class="app-table2-data">{{result.id}}</td>
                             <td class="app-table2-data">{{result.create_at}}</td>
                             <td class="app-table2-data">{{result.nameOnCard}}</td>
                             <td class="app-table2-data">{{result.accountNbr}}</td> 
-                            <td class="app-table2-data">-</td>
+                            <td class="app-table2-data">{{result.productName}}</td>
                             <td class="app-table2-data">{{result.productCode}}</td>  
-                            <th class="app-table2-data">{{ result.workflowId == 1 ? "Needs Approval" : "null"}}</th>
+                            <td class="app-table2-data">{{result.clientCode}}</td>  
                              <td class="app-table2-data">
-                                   <div @click="Approve(result)" style="cursor:pointer" class="table-btn">Approve<span class="table-button-icon"></span></div>
+                            <div @click="CheckStatus(result)" style="cursor:pointer" class="table-btn">Card Status<span class="table-button-icon"></span></div>
                             </td> 
                         </tr>
                         
@@ -58,15 +60,14 @@
 
 <script>
 import axios from 'axios'
-import Loader from '../../../components/Loader/Loader'
-import Status from '../../../components/Status/Status2'
+import Loader from '../../components/Loader/Loader'
+import Status from '../../components/Status/Status2'
 import {mapGetters} from 'vuex'
-import EmptyData from '../../../components/EmptyData/EmptyData'
-import Loading from '../../../components/Loading/Loading'
+import EmptyData from '../../components/EmptyData/EmptyData'
+import Loading from '../../components/Loading/Loading'
 
 
 export default {
-  props:['ApprovalRequests','approvalLoader'],
           components:{
      Loader,
      Status,
@@ -80,6 +81,15 @@ export default {
         status: false,
         state: null,
         message: null,
+        testData:[{
+            id: '1',
+            create_at: "12/02/21",
+            nameOnCard: 'Mutumbie John',
+            accountNbr: "0229282818",
+            productName: "Credit",
+            productCode: "889",
+            clientCode: "93930"
+        }]
     }
   },
         computed:{
@@ -93,18 +103,17 @@ this.status = false;
               location.reload();
          return false; 
     },
-  async  Approve(result){
+            async CheckStatus(result){
        this.loader = true
        const user = JSON.parse(localStorage.getItem("user-mfb"))
-         const formData = {
-              "requestId": [result.id],
-              "companyId": parseInt(user.companyId),
-              "workflowId": 2,
-              "userId": parseInt(user.id)
-            }
+          const form = {
+              "companyId": user.companyId,
+              "userId": user.id,
+              "clientCode": result.clientCode
+          }
          try {
            
-             const response = await axios.post(this.getUrl2 + 'api/CardRequest/approveoracknowledge',formData)
+             const response = await axios.post(this.getUrl2 + 'api/CardRequest/cardstatus',form)
              if(response.status == 200){
                this.loader = false;
                this.status = true;
@@ -126,7 +135,8 @@ this.status = false;
                this.message = 'Operation Failed'
          }
             
-    }
+      },
+ 
   },
 }
 </script>

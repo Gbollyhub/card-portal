@@ -3,7 +3,7 @@
         <Loader v-show="loader"/>
      <Status :state="state" :closeModal = "closeAddReload" :message = "message" :resetState="resetState" v-if="status"/>
                     <div class="app-modal-overlay" v-else>
-      <div class="app-modal-div" style="width:50%; height:50%; overflow:auto;">
+      <div class="app-modal-div" style="width:50%; height:60%; overflow:auto;">
       <div class="app-modal-heading">
         <div class="app-modal-header">Add Permission</div>
       </div>
@@ -11,11 +11,19 @@
           <form @submit.prevent="createPerm">
               <div className="form-flex">
       <div className="form-flex-col">
+        <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Permission Name</label> 
         <input v-model="form.name" type="text" className="app-modal-form-field w-input"  placeholder="Permission Name"  required/>
       </div>
        <div className="form-flex-col">
+         <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Description</label> 
         <input v-model="form.description" type="text" className="app-modal-form-field w-input"  placeholder="Description"  required/>
        </div>
+          <div className="form-flex-col">
+           <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Mfb or Bank</label> 
+         <select v-model="form.mfbOrBank" style="marginBottom: 30px" class="app-select w-select">
+             <option  v-for="(result, index) in permType" :key="index" :value="result">{{result}}</option>     
+            </select>
+        </div>
               </div>
     
           <button type="submit" style="display:block;cursor:pointer" class="app-modal-button">Add Permission</button>
@@ -48,8 +56,10 @@ export default {
           permAray:[],
           form: {
             name: '',
-            description: ''
-          }
+            description: '',
+            mfbOrBank: ''
+          },
+          permType: ['mfb','Bank']
       }
   },
       computed:{
@@ -68,15 +78,12 @@ this.status = false;
          const formData = {
                  name: this.form.name,
               description: this.form.description,
+              mfbOrBank: this.form.mfbOrBank,
               isActive: true
          }
          try {
            
-         const response = await axios.post(this.getUrl + 'api/permissions',formData,
-  //            {transformRequest: (data, headers) => {
-  //   delete headers.common['Content-Type'];
-  // }}
-             )
+         const response = await axios.post(this.getUrl + 'api/permissions',formData)
              if(response.status == 200){
                this.loader = false;
                this.status = true;

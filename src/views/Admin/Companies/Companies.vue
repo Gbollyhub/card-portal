@@ -4,7 +4,7 @@
               <AddMFB  :closeModal="closeModal" :closeModalReload="closeModalReload" />
           </div>
           <div v-show="EditModal">
-              <EditMFB :editActivities="activities" :closeModal="closeEdit" :closeEditReload="closeEditReload" :editData="editData"/>
+              <EditMFB :companyCardSetup="companyCardSetup" :editActivities="activities" :closeModal="closeEdit" :closeEditReload="closeEditReload" :editData="editData"/>
           </div>
             <div class="app-admin-col-1">
             <Leftbar/>
@@ -95,7 +95,8 @@ export default {
       AddCompanyModal: false,
       EditModal:false,
       editData:'',
-      activities:[]
+      activities:[],
+      companyCardSetup:""
     }
   },
   computed:{
@@ -120,23 +121,16 @@ export default {
            this.AddCompanyModal = true
        },
         async openEdit(result){
-        
-          try {
-           
+
              const response = await axios.get(this.getUrl + 'api/companies/CompanyAcivities/' + result.id)
-             if(response.status == 200){
+         const response2 = await axios.get(this.getUrl + 'api/CardProductSetup')
+             let cardSetup = response2.data
+             const y = cardSetup.find(x => { return x.companyId ==  result.id})
+             this.companyCardSetup = y
+
               this.activities = response.data
             this.editData = result
            this.EditModal = true
-             }
-             else{
-              return false
-             }
-
-         } catch (error) {
-              console.log(error)
-            
-         }
 
        },
         closeEdit(){

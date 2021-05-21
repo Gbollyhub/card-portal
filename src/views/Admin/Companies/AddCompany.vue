@@ -78,13 +78,12 @@
              <option  v-for="(result, index) in branches" :key="index" :value="result.branchNo">{{result.branchName}}</option>     
             </select>
         </div>
-        <div className="form-flex-col">
-           <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Card Product Name</label> 
-        <input v-model="form.productName" type="text" className="app-modal-form-field w-input"  placeholder="Type Here"  required/>
-        </div>
-        <div className="form-flex-col">
-           <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Card Product Code</label> 
-        <input v-model="form.productCode" type="text" className="app-modal-form-field w-input"  placeholder="Type Here"  required/>
+         <div className="form-flex-col">
+           <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Card Product</label> 
+         <select @change="savecardSetup($event)" style="marginBottom: 30px" class="app-select w-select">
+               <option selected>Select a Card Product</option> 
+             <option  v-for="(result, index) in cardSetup" :key="index" :value="result.cardProductCode">{{result.description}}</option>     
+            </select>
         </div>
                </div>
                  <div class="app-modal-heading">
@@ -122,7 +121,6 @@ export default {
         status: false,
         state: null,
         message: null,
-        activities:['Instant Card Request', 'Default Pin Generation','Pin Re-issue Request','Charge-back Request', 'Card Cancellation', 'Card Activation/Deactivation'],
         activityArray:[],
         companyId: "",
         form:{
@@ -144,7 +142,8 @@ export default {
             mobileNo: '',
             rolesId: 0
           },
-          branches:[]
+          branches:[],
+          cardSetup:[]
       }
   },
     computed:{
@@ -158,9 +157,20 @@ export default {
       created(){
     this.$store.dispatch("getActivities");
     this.$store.dispatch("getRoles");
-    this.getBranch()
+    this.getBranch();
+    this.getCardSetup()
   },
   methods: {
+    savecardSetup(result){
+    let cardCode = result.target.value;
+    const y = this.cardSetup.find(x => { return x.cardProductCode == cardCode})
+    this.form.productName = y.description;
+    this.form.productCode = y.cardProductCode;
+    },
+    async getCardSetup(){
+      const result = await axios.get(this.getUrl + 'api/CardProductSetup/FetchCardProductCodeForsetup')
+       this.cardSetup = result.data
+    },
     async getBranch(){
            const result = await axios.get(this.getUrl2 + 'api/Common/Branch')
            this.branches = result.data

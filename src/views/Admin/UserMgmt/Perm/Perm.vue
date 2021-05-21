@@ -21,17 +21,19 @@
               <table class="app-table2">
                                   <thead>
                                       <tr class="app-table2-row">
-                                         <th class="app-table2-header">Id</th>
-                                      <th class="app-table2-header">Role</th>
+                                         <th class="app-table2-header">S/N</th>
+                                      <th class="app-table2-header">Permission</th>
                                       <th class="app-table2-header">Description</th>
+                                      <th class="app-table2-header">Mfb/Bank</th>
                                       <th class="app-table2-header"></th>
                                   </tr>
                                   </thead>
                                   <tbody>
                                   <tr v-for="(result, index) in getPermissions" :key="index" class="app-table2-row">
-                                    <td class="app-table2-data">{{result.id}}</td>
+                                    <td class="app-table2-data">{{index + 1}}</td>
                                   <td class="app-table2-data">{{result.name}}</td>
                                       <td class="app-table2-data"> {{result.description}} </td>
+                                      <td class="app-table2-data"> {{result.mfbOrBank}} </td>
                                         <td class="app-table2-data">
               <div  @click="openEdit(result)" style="cursor:pointer" class="table-btn">Update<span class="table-button-icon"></span></div>
                             </td>

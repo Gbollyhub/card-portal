@@ -7,6 +7,7 @@
         <div class="admin-top-bar">
         <div class="admin-top-bar-left">
         <div class="settings-icon"></div>
+        <div @click = "switchView('All')" class="admin-top-barlinks" :class="[ AllView ? activeClass : '']">All Requests</div>
         <div @click = "switchView('Approval')" class="admin-top-barlinks" :class="[ ApprovalView ? activeClass : '']">Pending Approval</div>
         <div @click = "switchView('Acknowledge')" class="admin-top-barlinks" :class="[ AcknowledgeView ? activeClass : '']">Pending Acknowledgement</div>
         </div>
@@ -14,11 +15,14 @@
           <div class="admin-topbar-date">October 8th, 2020</div>
         </div>
       </div>
+       <div v-show="AllView">
+        <All :AllLoader="AllLoader" :AllRequests="AllRequests"/> 
+        </div>
         <div v-show="ApprovalView">
-        <Approval :ApprovalRequests="ApprovalRequests"/> 
+        <Approval :approvalLoader="approvalLoader" :ApprovalRequests="ApprovalRequests"/> 
         </div>
             <div v-show="AcknowledgeView">
-           <Acknowledge :AcknowledgeRequests="AcknowledgeRequests"/>       
+           <Acknowledge :AcknowledgeLoader="AcknowledgeLoader" :AcknowledgeRequests="AcknowledgeRequests"/>       
             </div>
     </div>
       <div class="app-admin-col-3">
@@ -33,6 +37,7 @@ import Leftbar from '../../../components/Client/leftbar/leftbar'
 import Rightbar from '../../../components/Client/rightbar/rightbar'
 import Approval from './Approval'
 import Acknowledge from './Acknowledge'
+import All from './All'
 import axios from 'axios'
 import {mapGetters} from 'vuex'
 export default {
@@ -41,43 +46,70 @@ export default {
     Leftbar,
     Rightbar,
     Approval,
-    Acknowledge
+    Acknowledge,
+    All
   },
   data(){
       return{
         selectedTab: '',
-        ApprovalView: true,
+        AllView: true,
+        ApprovalView: false,
         AcknowledgeView: false,
         activeClass:'admin-active-top-link',
         ApprovalRequests:[],
-        AcknowledgeRequests:[]
+        AcknowledgeRequests:[],
+        AllRequests:[],
+        AllLoader: false,
+        approvalLoader: false,
+        AcknowledgeLoader: false
       }
   },
   created(){
       this.fetchApprovalRequests();
-      this.fetchAcknowledgeRequests()
+      this.fetchAcknowledgeRequests();
+      this.fetchAllRequests()
   },
       computed:{
     ...mapGetters([ 'getUrl2' ])
     }, 
 methods:{
+    async fetchAllRequests(){
+        this.AllLoader = true
+         const companyId = JSON.parse(localStorage.getItem("user-mfb"))
+ const result = await axios.get(this.getUrl2 + '/api/CardRequest/all/'+companyId.companyId)
+           this.AllRequests = result.data
+         this.AllLoader = false
+  },
 
   async fetchApprovalRequests(){
- const result = await axios.get(this.getUrl2 + '/api/CardRequest/pendingApproval/7')
+        this.approvalLoader = true
+         const companyId = JSON.parse(localStorage.getItem("user-mfb"))
+ const result = await axios.get(this.getUrl2 + '/api/CardRequest/pendingApproval/'+companyId.companyId)
            this.ApprovalRequests = result.data
+         this.approvalLoader = false
   },
     async fetchAcknowledgeRequests(){
- const result = await axios.get(this.getUrl2 + 'api/CardRequest/pendingacknowledgement/7')
+          this.AcknowledgeLoader = true
+           const companyId = JSON.parse(localStorage.getItem("user-mfb"))
+ const result = await axios.get(this.getUrl2 + 'api/CardRequest/pendingacknowledgement/'+companyId.companyId)
            this.AcknowledgeRequests = result.data
+               this.AcknowledgeLoader = false
   },
     
     switchView( selected ){
 
-        if(selected == "Approval"){
+        if(selected == "All"){
+           this.AllView = true
+         this.ApprovalView = false
+         this.AcknowledgeView = false
+        }
+        else if(selected == 'Approval') {
+           this.AllView = false
          this.ApprovalView = true
          this.AcknowledgeView = false
         }
         else if(selected == 'Acknowledge') {
+          this.AllView = false
          this.ApprovalView = false
          this.AcknowledgeView = true
         }

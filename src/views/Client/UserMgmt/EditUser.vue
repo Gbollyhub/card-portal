@@ -1,41 +1,46 @@
 <template>
   <div>
         <Loader v-show="loader"/>
-     <Status :state="state" :closeModal = "closeAdd" :message = "message" :resetState="resetState" v-if="status"/>
+     <Status :state="state" :closeModal = "closeEditReload" :message = "message" :resetState="resetState" v-if="status"/>
                     <div class="app-modal-overlay" v-else>
-      <div class="app-modal-div" style="width:30%; height:50%; overflow:auto;">
+      <div class="app-modal-div" style="width:70%; height:80%; overflow:auto;">
       <div class="app-modal-heading">
-        <div class="app-modal-header">Update User</div>
+        <div class="app-modal-header">Add User</div>
       </div>
       <div>
-          <form @submit.prevent="updateUser">
-         <div className="form-flex">
+          <form @submit.prevent="createUser">
+        <div className="form-flex">
       <div className="form-flex-col">
-        <input v-model="form.firstName" type="text" className="app-modal-form-field w-input"  placeholder="First Name"  required/>
+          <label style="color:#a3a3a3; font-weight:500;font-size:13px" >First Name</label> 
+        <input :value="userData.firstName" id="firstName" type="text" className="app-modal-form-field w-input"  placeholder="First Name"  required/>
         </div>
          <div className="form-flex-col">
-        <input v-model="form.lastName" type="text" className="app-modal-form-field w-input"  placeholder="Last Name"  required/>
+             <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Last Name</label> 
+        <input :value="userData.lastName" id="lastName" type="text" className="app-modal-form-field w-input"  placeholder="Last Name"  required/>
         </div>
          <div className="form-flex-col">
-        <input v-model="form.emailAddress" type="text" className="app-modal-form-field w-input"  placeholder="Email Address"  required/>
+             <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Email Address</label> 
+        <input :value="userData.email" id="emailAddress" type="text" className="app-modal-form-field w-input"  placeholder="Email Address"  required/>
         </div>
          <div className="form-flex-col">
-        <input v-model="form.userName" type="text" className="app-modal-form-field w-input"  placeholder="Username"  required/>
+             <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Username</label> 
+        <input :value="userData.userName" id="userName" type="text" className="app-modal-form-field w-input"  placeholder="Username"  required/>
         </div>
          <div className="form-flex-col">
-        <input v-model="form.mobileNo" type="text" className="app-modal-form-field w-input"  placeholder="Phone Number"  required/>
+             <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Phone Number</label> 
+        <input :value="userData.tel" id="mobileNo" type="text" className="app-modal-form-field w-input"  placeholder="Phone Number"  required/>
         </div>
          <div className="form-flex-col">
-          <select v-model="form.roleId" style="marginBottom: 30px" class="app-select w-select">
-               <option value="0">Select a Role</option> 
-             <option  v-for="(role, index) in roles" :key="index" :value="index">{{role}}</option>        
-            </select>
+             <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Role(Update: {{userData.role}})</label> 
+            <select v-model="form.rolesId" style="marginBottom: 30px" class="app-select w-select">
+            <option  v-for="(role, index) in getRoles" :key="index" :value="role.id">{{role.name}}</option>        
+        </select>
          </div>
         </div>
-          <button type="submit" style="marginTop:20px;display:block;cursor:pointer" class="app-modal-button">Update User</button>
+          <button type="submit" style="marginTop:20px;display:block;cursor:pointer" class="app-modal-button">Add User</button>
         </form>
       </div>
-      <div @click= "closeAdd" class="app-modal-close"></div>
+      <div @click= "closeEdit" class="app-modal-close"></div>
     </div>
   </div>
   </div>
@@ -45,8 +50,9 @@
 import axios from 'axios'
 import Loader from '../../../components/Loader/Loader'
 import Status from '../../../components/Status/Status'
+import {mapGetters} from 'vuex'
 export default {
-    props:['closeAdd', 'userData'],
+    props:['closeEdit','closeEditReload', 'userData'],
         components:{
      Loader,
      Status
@@ -65,28 +71,41 @@ export default {
             emailAddress: '',
             userName: '',
             mobileNo: '',
-            rolesId: 0
+            rolesId: ''
           }
       }
   },
+        computed:{
+    ...mapGetters([
+      'getUrl',
+      'getRoles',
+    ])
+  },
+    created(){
+   this.$store.dispatch("getRoles");
+  },
   methods: {
-    async updateUser(){
+            resetState(){
+this.status = false;
+    },
+    async createUser(){
        this.loader = true
+       const companyId = JSON.parse(localStorage.getItem("user-mfb"))
          const formData = {
-                                firstName: this.form.firstName,
-                  lastName: this.form.lastName,
-                  emailAddress: this.form.emailAddress,
-                  userName: this.form.userName,
-                  mobileNo: this.form.mobileNo,
-                  rolesId: this.form.rolesId
+                  id: this.userData.id,
+                 userName: document.getElementById("userName").value,
+                  companyId: companyId.companyId,
+                  firstName: document.getElementById("firstName").value,
+                  lastName: document.getElementById("lastName").value,
+                  emailAddress: document.getElementById("emailAddress").value,
+                  userName: document.getElementById("userName").value,
+                  mobileNo: document.getElementById("mobileNo").value,
+                  rolesId: this.form.rolesId == "" ? this.editData.rolesId : this.form.rolesId,
+                  isActive: true,
          }
          try {
            
-             const response = await axios.put(this.getUrl + 'api/companyusers',formData,
-  //            {transformRequest: (data, headers) => {
-  //   delete headers.common['Content-Type'];
-  // }}
-             )
+             const response = await axios.post(this.getUrl + 'api/companyusers/update',formData)
              if(response.status == 200){
                this.loader = false;
                this.status = true;

@@ -13,7 +13,7 @@
         </div>
       </div>
       <div class="content-header">Activities</div>
-      <div class="content-sub">Here are the latest reports on the system</div>
+      <div class="content-sub">Here are the activities on the system</div>
       <Loading v-if="isFetchingActivities" />
       <div v-else class="summary-flexbox">
         <div class="content-slide-box" v-for="(item, index) in activities_computed" :key="index">
@@ -65,9 +65,10 @@ export default {
   methods:{
     fetchCompanyActivities:function (){
       this.isFetchingActivities = true;
+       const companyId = JSON.parse(localStorage.getItem("user-mfb"))
       Promise.all([
         this.$store.dispatch("fetchActivities"),
-        this.$store.dispatch("fetchCompanyActivities"),
+        this.$store.dispatch("fetchCompanyActivities",companyId.companyId),
       ]).then((response)=>{
             console.log("Done",response)
             this.activities = response[0].data;
@@ -81,8 +82,7 @@ export default {
   },
   computed: {
     activities_computed: function () {
-      return this.companyActivities.map((ca)=>{
-        let activity = this.activities.find((a)=>{return ca.activitiesId === a.id});
+      return this.companyActivities.map((activity)=>{
         return {
           title : activity.name,
           url : `activity-form/${activity.id}`

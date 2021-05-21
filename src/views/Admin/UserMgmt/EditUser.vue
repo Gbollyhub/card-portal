@@ -9,8 +9,9 @@
       </div>
       <div>
           <form @submit.prevent="updateUser">
-        <input :value="userData.userName" type="text" className="app-modal-form-field w-input" id="userName"  placeholder="Name of User"  required/>
-      
+             <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Username</label> 
+        <input :value="userData.userName" type="text" className="app-modal-form-field w-input" id="userName"  placeholder="Username"  required/>
+       <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Role</label> 
           <select :value="userData.roleId" style="marginBottom: 30px" class="app-select w-select" id="roleId">
                <option selected>Select a Role</option> 
              <option  v-for="(role, index) in getRoles" :key="index" :value="role.id">{{role.name}}</option>        

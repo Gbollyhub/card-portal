@@ -7,19 +7,19 @@
             <div class="admin-top-bar">
         <div class="admin-top-bar-left">
           <div class="settings-icon"></div>
-          <div @click = "switchView('user')" class="admin-top-barlinks admin-active-top-link">User</div>
-          <!-- <div @click = "switchView('roles')" class="admin-top-barlinks">Roles</div> -->
+          <div @click = "switchView('user')" class="admin-top-barlinks" :class="[ userView ? activeClass : '']">User</div>
+          <!-- <div @click = "switchView('roles')" class="admin-top-barlinks" :class="[ rolesView ? activeClass : '']">Roles</div> -->
         </div>
          <div class="admin-top-bar-right">
-          <div class="admin-topbar-date">October 8th, 2020</div>
+          <div class="admin-topbar-date">{{Date.now()}}</div>
         </div>
       </div>
         <div v-show="userView">
         <User/> 
         </div>
-            <div v-show="rolesView">
+            <!-- <div v-show="rolesView">
            <Roles/>       
-            </div>
+            </div> -->
     </div>
       <div class="app-admin-col-3">
               <Rightbar />
@@ -46,6 +46,7 @@ export default {
         selectedTab: '',
         userView: true,
         rolesView: false,
+       activeClass:'admin-active-top-link'
       }
   },
 methods:{

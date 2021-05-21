@@ -11,11 +11,19 @@
           <form @submit.prevent="updatePerm">
               <div className="form-flex">
       <div className="form-flex-col">
+         <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Permission Name</label> 
         <input :value="editData.name" type="text" className="app-modal-form-field w-input" id="testField1" />
       </div>
        <div className="form-flex-col">
+          <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Description</label> 
         <input :value="editData.description" type="text" className="app-modal-form-field w-input" id="testField2" />
        </div>
+                 <div className="form-flex-col">
+           <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Mfb or Bank (Update: {{editData.mfbOrBank}})</label> 
+         <select v-model="form.mfbOrBank" style="marginBottom: 30px" class="app-select w-select">
+             <option  v-for="(result, index) in permType" :key="index" :value="result">{{result}}</option>     
+            </select>
+        </div>
         
               </div>
 
@@ -50,8 +58,10 @@ export default {
   
           form: {
             name: '',
-            description: ''
-          }
+            description: '',
+              mfbOrBank: ""
+          },
+           permType: ['mfb','Bank']
       }
   },
       computed:{
@@ -66,13 +76,7 @@ export default {
 this.status = false;
     },
     testPerm(){
-    const permName = document.getElementById("permname").value
-    const permDes = document.getElementById("description").value
-    const field = document.getElementById("testField1").value
-      const field2 = document.getElementById("testField2").value
-    console.log("permName:" + permName + "PermDes" + permDes)
-    console.log("test:" + field)
-     console.log("test2:" + field2)
+
     },
     async updatePerm(){
        this.loader = true
@@ -80,6 +84,7 @@ this.status = false;
               id:this.editData.id,
               name: document.getElementById("testField1").value,
               description: document.getElementById("testField2").value,
+              mfbOrBank: this.form.mfbOrBank == "" ? this.editData.mfbOrBank : this.form.mfbOrBank,
               isActive: true
          }
          try {

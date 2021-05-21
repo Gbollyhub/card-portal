@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-show="AddUserModal">
-      <AddUser :closeAdd="closeAdd"/>
+       <AddUser :closeAdd="closeAdd" :closeAddReload="closeAddReload"/>
     </div>
     <div v-show="EditUserModal">
-      <EditUser :closeEdit="closeEdit" :userData="userData"/>
+     <EditUser :closeEdit="closeEdit" :userData="userData" :closeEditReload="closeEditReload"/>
     </div>
     <div class="content-header">Manage Users</div>
     <div class="content-sub">Here are the list of users available</div>
@@ -36,15 +36,15 @@
           </thead>
           <tbody>
           <tr v-for="(user_item) in companyUsersComputed" :key="user_item.id">
-            <td class="app-table-data">{{user_item.id}}</td>
-            <td class="app-table-data">{{user_item.firstName}}</td>
-            <td class="app-table-data">{{user_item.lastName}}</td>
-            <td class="app-table-data">{{user_item.email}}</td>
-            <td class="app-table-data">{{user_item.userName}}</td>
-            <td class="app-table-data">{{user_item.tel}}</td>
-            <td class="app-table-data">{{user_item.role}}</td>
+            <td class="app-table2-data">{{user_item.id}}</td>
+            <td class="app-table2-data">{{user_item.firstName}}</td>
+            <td class="app-table2-data">{{user_item.lastName}}</td>
+            <td class="app-table2-data">{{user_item.email}}</td>
+            <td class="app-table2-data">{{user_item.userName}}</td>
+            <td class="app-table2-data">{{user_item.tel}}</td>
+            <td class="app-table2-data">{{user_item.role}}</td>
             <td class="app-table2-data">
-              <div class="table-btn" style="cursor:pointer" @click="openEdit(result)">Update User<span
+              <div class="table-btn" style="cursor:pointer" @click="openEdit(user_item)">Update User<span
                   class="table-button-icon"></span></div>
             </td>
           </tr>
@@ -110,7 +110,7 @@ export default {
           userName : `${user.userName}`,
           email : user.emailAddress,
           tel : user.mobileNo,
-          role : "",//this.roles.find((entry)=>{return user.rolesId === entry.id}).name,
+          // role : this.roles.find((entry)=>{return user.rolesId === entry.id}).name,
           status : user.isActive
         }
       });
@@ -120,24 +120,35 @@ export default {
   //  this.$store.dispatch("getAdminUsers");
   },
   methods: {
-    closeAdd() {
-      this.AddUserModal = false
-    },
-    openAdd() {
-      this.AddUserModal = true
-    },
-    closeEdit() {
-      this.EditUserModal = false
-    },
-    openEdit(result) {
-      this.userData = result
-      this.EditUserModal = true
-    },
+         closeAdd(){
+           this.AddUserModal = false
+       },
+       closeAddReload(){
+           this.AddUserModal = false
+           location.reload();
+         return false;
+       },
+        openAdd(){
+           this.AddUserModal = true
+       },
+                closeEdit(){
+           this.EditUserModal = false
+       },
+         closeEditReload(){
+           this.EditUserModal = false
+            location.reload();
+         return false;
+       },
+        openEdit(result){
+          console.log("clickeduser")
+          this.userData = result
+           this.EditUserModal = true
+       },
     fetchUsers:function (){
         this.isFetchingUsers = true;
-
+    const companyId = JSON.parse(localStorage.getItem("user-mfb"))
           Promise.all([
-            this.$store.dispatch("fetchCompanyUsers"),
+            this.$store.dispatch("fetchCompanyUsers",companyId.companyId),
             this.$store.dispatch("fetchRoles")
           ])
       .then((response)=>{

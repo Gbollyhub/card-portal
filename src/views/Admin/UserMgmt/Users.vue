@@ -32,7 +32,7 @@
                                   <tr v-for="(result, index) in getAdminUsers" :key="index" class="app-table2-row">
                                     <td class="app-table2-data">{{result.id}}</td>
                                   <td class="app-table2-data">{{result.userName}}</td>
-                                      <td class="app-table2-data"> {{result.rolesId}} </td>
+                                      <!-- <td class="app-table2-data"> {{result.rolesId}} </td> -->
                             <td class="app-table2-data">
                             <div @click="openEdit(result)" style="cursor:pointer" class="table-btn">Manage User<span class="table-button-icon"></span></div>
                             </td>

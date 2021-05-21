@@ -1,4 +1,6 @@
 <template>
+  <Loader v-show="loader"/>
+  <Status :state="state" :closeModal = "closeAddReload" :message = "message" :resetState="resetState" v-if="status"/>
   <div class="content-header">Instant Card Request </div>
   <form @submit.prevent="sendRequest">
     <div class="form-flex">
@@ -10,15 +12,15 @@
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">First Name<span style="color:red">*</span></label>
-        <input v-model="form.firstName" type="text" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.firstName" type="text" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Middle Name<span style="color:red">*</span></label>
-        <input v-model="form.middleName" type="text" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.middleName" type="text" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Last Name<span style="color:red">*</span></label>
-        <input v-model="form.lastName" type="text" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.lastName" type="text" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Gender<span style="color:red">*</span></label>
@@ -34,20 +36,20 @@
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Mobile No<span style="color:red">*</span></label>
-        <input v-model="form.mobileNo" type="text" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.mobileNo" type="text" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Email Address<span style="color:red">*</span></label>
-        <input v-model="form.email" type="email" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.email" type="email" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Date of Birth<span style="color:red">*</span></label>
-        <input v-model="form.dateOfBirth" type="date" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.dateOfBirth" type="date" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
 
       <div class="form-flex-col-3">
         <label class="login-label">Address Line 1<span style="color:red">*</span></label>
-        <input v-model="form.addressLine1" type="text" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.addressLine1" type="text" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Address Line 2</label>
@@ -74,7 +76,7 @@
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Legal ID Number<span style="color:red">*</span></label>
-        <input v-model="form.legalID" type="text" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.legalID" type="text" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">ID Type<span style="color:red">*</span></label>
@@ -84,19 +86,19 @@
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Issued Date<span style="color:red">*</span></label>
-        <input v-model="form.documentIssueDate" type="date" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.documentIssueDate" type="date" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Expiry Date<span style="color:red">*</span></label>
-        <input v-model="form.expiryDateOfDoc" type="date" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.expiryDateOfDoc" type="date" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Account Number<span style="color:red">*</span></label>
-        <input v-model="form.accountNbr" type="text" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.accountNbr" type="text" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Name on Card<span style="color:red">*</span></label>
-        <input v-model="form.nameOnCard" type="text" class="app-text-field w-input" required placeholder="Type Here" />
+        <input v-model="form.nameOnCard" type="text" class="app-text-field w-input" id="did" placeholder="Type Here" />
       </div>
       <div class="form-flex-col-3">
         <label class="login-label">Socio Prof Code<span style="color:red">*</span></label>
@@ -130,7 +132,7 @@ export default {
     Status
   },
   computed:{
-    ...mapGetters([ 'getUrl2' ])
+    ...mapGetters([ 'getUrl2', 'getUrl' ])
   },
   mixins: [operationMixen],
   data(){
@@ -196,10 +198,40 @@ export default {
       this.status = false;
     },
     async sendRequest(){
-      this.loader = true
+      this.loader = true;
+            const user = JSON.parse(localStorage.getItem("user-mfb"))
+     const company = await axios.get(this.getUrl + 'api/companies/' + parseInt(user.companyId))
+      const companyProduct = await axios.get(this.getUrl + '/api/CardProductSetup')
+     const product = await companyProduct.data.find(x => { return x.companyId == parseInt(user.companyId) })
+       const formData ={
+        "productCode": product.cardProductCode,
+        "branchNo": company.data.branch,
+        "companyId": parseInt(user.companyId),
+        "userId": parseInt(user.id),
+        "title": this.form.title,
+        "firstName": this.form.firstName,
+        "middleName": this.form.middleName,
+        "lastName": this.form.lastName,
+        "gender": this.form.gender,
+        "maritalStatus": this.form.maritalStatus,
+        "mobileNo": this.form.mobileNo,
+        "email": this.form.email,
+        "dateOfBirth": this.form.dateOfBirth,
+        "addressLine1": this.form.addressLine1,
+        "addressLine2": this.form.addressLine2,
+        "cityCode": this.form.cityCode,
+        "regionCode":this.form.regionCode,
+        "countryCode": this.form.countryCode,
+        "legalID": this.form.legalID,
+        "idCardTypeCode": this.form.idCardTypeCode,
+        "documentIssueDate": this.form.documentIssueDate,
+        "expiryDateOfDoc": this.form.expiryDateOfDoc,
+        "accountNbr": this.form.accountNbr,
+        "nameOnCard": this.form.nameOnCard,
+        "socioProfCode": this.form.socioProfCode
+      }
       try {
-
-        const response = await axios.post(this.getUrl2 + 'api/CardRequest/makecardrequest',[this.form])
+        const response = await axios.post(this.getUrl2 + 'api/CardRequest/makecardrequest',[formData])
         if(response.status == 200){
           this.loader = false;
           this.status = true;

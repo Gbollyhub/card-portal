@@ -2,8 +2,8 @@
   <div>
        <Loader v-show="loader"/>
      <Status :state="state"  :message = "message" :resetState="resetState" v-if="status"/>
- <div class="content-header">Pending Card Requests Approval</div>
-      <div class="content-sub">Here are the requests that need approval</div>
+ <div class="content-header">All Card Requests</div>
+      <div class="content-sub">Here are the all the card requests</div>
       <div class="app-table-actions">
         <div class="app-table-search">
           <div class="form-block w-form">
@@ -16,9 +16,9 @@
           <a href="#" class="table-button">Actions <span class="table-button-icon"></span></a>
         </div> -->
       </div>
-           <Loading v-if="approvalLoader"/>
+           <Loading v-if="AllLoader"/>
            <div v-else>
-                     <table class="app-table2" v-if="!ApprovalRequests.length <= 0">
+                     <table class="app-table2" v-if="!AllRequests.length <= 0">
                     <thead>
                         <tr class="app-table2-row">
                            <th class="app-table2-header">Id</th>
@@ -34,14 +34,20 @@
                     </thead>
             
                         <tbody>
-                              <tr v-for="(result, index) in ApprovalRequests" :key="index" class="app-table2-row">
+                              <tr v-for="(result, index) in AllRequests" :key="index" class="app-table2-row">
                             <td class="app-table2-data">{{result.id}}</td>
                             <td class="app-table2-data">{{result.create_at}}</td>
                             <td class="app-table2-data">{{result.nameOnCard}}</td>
                             <td class="app-table2-data">{{result.accountNbr}}</td> 
                             <td class="app-table2-data">-</td>
                             <td class="app-table2-data">{{result.productCode}}</td>  
-                            <th class="app-table2-data">{{ result.workflowId == 1 ? "Needs Approval" : "null"}}</th>
+                            <th class="app-table2-data">{{ result.workflowId == 1 ? "Needs Approval" : 
+                                result.workflowId == 2 ? "Awaiting processing" : 
+                                result.workflowId == 3 ? "Approved" :
+                                 result.workflowId == 4 ? "Awaiting processing" :
+                                  result.workflowId == 5 ? "Processed and Shipped" :
+                                   result.workflowId == 6 ? "Needs Acknowledgement" : "null"
+                                }}</th>
                              <td class="app-table2-data">
                                    <div @click="Approve(result)" style="cursor:pointer" class="table-btn">Approve<span class="table-button-icon"></span></div>
                             </td> 
@@ -66,7 +72,7 @@ import Loading from '../../../components/Loading/Loading'
 
 
 export default {
-  props:['ApprovalRequests','approvalLoader'],
+  props:['AllRequests','AllLoader'],
           components:{
      Loader,
      Status,

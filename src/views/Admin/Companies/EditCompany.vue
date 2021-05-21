@@ -11,27 +11,41 @@
           <form @submit.prevent="updateCompany">
                <div className="form-flex">
       <div className="form-flex-col">
+        <label style="color:#a3a3a3; font-weight:500;font-size:13px" >MFB Name</label> 
         <input  :value="editData.name" type="text" className="app-modal-form-field w-input"  placeholder="MFB Name" id="name" required/>
         </div>
          <div className="form-flex-col">
+                <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Account Number</label> 
         <input :value="editData.accountNumber" type="text" className="app-modal-form-field w-input"  placeholder="Account Number" id="accountNumber"  required/>
         </div>
          <div className="form-flex-col">
+            <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Company Code</label> 
         <input readonly :value="editData.companyCode" type="text" className="app-modal-form-field w-input"  placeholder="Company Code" id="companyCode"  required/>
         </div>
           <div className="form-flex-col">
+             <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Email Address</label> 
         <input :value="editData.emailAddress" type="text" className="app-modal-form-field w-input"  placeholder="Email Address" id="emailAddress"  required/>
         </div>
         <div className="form-flex-col">
+          <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Phone Number</label> 
         <input :value="editData.phoneNumber" type="text" className="app-modal-form-field w-input"  placeholder="Phone Number" id="phoneNumber"  required/>
         </div>
         <div className="form-flex-col">
+           <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Address</label> 
         <input :value="editData.address" type="text" className="app-modal-form-field w-input"  placeholder="Address" id="address"  required/>
         </div>
          <div className="form-flex-col">
+            <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Branch</label> 
         <input :value="editData.branch" type="text" className="app-modal-form-field w-input"  placeholder="Branch" id="branch"  required/>
         </div>
-               </div>
+                 <div className="form-flex-col">
+           <label style="color:#a3a3a3; font-weight:500;font-size:13px" >Card Product</label> 
+         <select @change="savecardSetup($event)" style="marginBottom: 30px" class="app-select w-select">
+               <option disabled selected>Update Card Product (Existing:{{companyCardSetup.productName}})</option> 
+             <option  v-for="(result, index) in cardSetup" :key="index" :value="result.cardProductCode">{{result.description}}</option>     
+            </select>
+        </div>
+         </div>
         <div class="app-modal-heading">
         <div class="app-modal-header">Assigned Activities</div>
       </div>
@@ -64,7 +78,7 @@ import {mapGetters} from 'vuex'
 import Loader from '../../../components/Loader/Loader'
 import Status from '../../../components/Status/Status'
 export default {
-    props:['closeModal','closeEditReload','editData', 'editActivities'],
+    props:['closeModal','closeEditReload','editData', 'editActivities', 'companyCardSetup'],
         components:{
      Loader,
      Status
@@ -85,7 +99,10 @@ export default {
           phoneNumber: "",
           accountNumber: "",
           branch: "",
-        }
+         productName:"",
+          productCode:""
+        },
+          cardSetup:[],
       }
   },
       computed:{
@@ -96,8 +113,19 @@ export default {
   },
   created(){
     this.$store.dispatch("getActivities");
+    this.getCardSetup()
   },
   methods: {
+    savecardSetup(result){
+    let cardCode = result.target.value;
+    const y = this.cardSetup.find(x => { return x.cardProductCode == cardCode})
+    this.form.productName = y.description;
+    this.form.productCode = y.cardProductCode;
+    },
+    async getCardSetup(){
+      const result = await axios.get(this.getUrl + 'api/CardProductSetup/FetchCardProductCodeForsetup')
+       this.cardSetup = result.data
+    },
         resetState(){
 this.status = false;
     },
@@ -147,6 +175,29 @@ this.status = false;
                   console.log("Actvities created")
                   this.addProduct(companyId)
                 }
+
+             else{
+               this.loader = false;
+               this.status = true;
+               this.state = 'failed';
+               this.message = 'Operation Failed'
+             }
+      },
+             async addProduct(companyId){
+                  const response3 = await axios.post(this.getUrl + 'api/CardProductSetup', {
+                companyId: parseInt(companyId),
+                productName: this.form.productName,
+                cardProductCode: this.form.productCode,
+                isActive: true
+                      })
+                      
+               if(response3.status == 200){ 
+                  console.log("Company Updated")
+                 this.loader = false;
+               this.status = true;
+               this.state = 'success';
+               this.message = 'Operation Sucessful'
+             }
 
              else{
                this.loader = false;

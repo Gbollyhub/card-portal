@@ -37,17 +37,26 @@
         <div class="content-slide-box">
           <div class="content-info-card">
             <div class="div-block-2">
-              <div class="slide-card-header">User Requests</div>
-              <div class="slide-card-value">{{user_requests_total}}</div>
+              <div class="slide-card-header">Card Requests</div>
+              <div class="slide-card-value">{{card_requests_total}}</div>
             </div>
             <div class="slide-card-icon purple"></div>
           </div>
         </div>
-        <div class="content-slide-box">
+         <div class="content-slide-box">
           <div class="content-info-card">
             <div class="div-block-2">
-              <div class="slide-card-header">Card Requests</div>
-              <div class="slide-card-value">{{card_requests_total}}</div>
+              <div class="slide-card-header">Pending Requests Approval</div>
+              <div class="slide-card-value">{{pending_approval_total}}</div>
+            </div>
+            <div class="slide-card-icon purple"></div>
+          </div>
+        </div>
+         <div class="content-slide-box">
+          <div class="content-info-card">
+            <div class="div-block-2">
+              <div class="slide-card-header">Pending Requests Acknowledgement</div>
+              <div class="slide-card-value">{{pending_acknowledgement_total}}</div>
             </div>
             <div class="slide-card-icon purple"></div>
           </div>
@@ -76,7 +85,7 @@
               <td class="app-table-data">{{user_item.displayName}}</td>
               <td class="app-table-data">{{user_item.email}}</td>
               <td class="app-table-data">{{user_item.tel}}</td>
-              <td class="app-table-data">{{user_item.role}}</td>
+              <!-- <td class="app-table-data">{{user_item.role}}</td> -->
               <td class="app-table-data">22/03/21</td>
               <td class="app-table-data table-active">{{user_item.status?"Active":"Disabled"}}</td>
             </tr>
@@ -128,14 +137,17 @@ export default {
   methods:{
     fetchDashboard:function (){
       this.isFetchingDashBoard = true;
-      this.$store.dispatch("getClientDashboardData",1)
+     const companyId = JSON.parse(localStorage.getItem("user-mfb"))
+      this.$store.dispatch("getClientDashboardData",companyId.companyId)
           .then((response)=>{
             console.log("Done",response)
+            this.users_list = response[0].data;
             this.users_total = response[0].data.length;
             this.activities_total = response[1].data.length;
             this.card_requests_total = response[2].data.length;
-            this.users_list = response[0].data;
-            this.roles = response[3].data;
+             this.pending_approval_total = response[3].data.length;
+             this.pending_acknowledgement_total = response[4].data.length
+            this.roles = response[5].data;
           })
           .catch((error)=>{
             alert(`Error : ${error}`)

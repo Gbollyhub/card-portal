@@ -81,7 +81,17 @@ export default createStore({
           }
         }
         )
-      commit('setAdminUsers', result.data)
+       const users = result.data
+       const adminUsers = users.map(user => { 
+         return {
+            id: user.id,
+            userName: user.userName,
+            // rolesId : this.state.roles.find((entry)=>{return user.rolesId === entry.id}).name,
+            created_at : user.created_at
+         }
+        })
+        console.log(adminUsers)
+      commit('setAdminUsers', adminUsers)
     },
 
     async getCompanies({commit, state}){
@@ -138,8 +148,9 @@ export default createStore({
           )
       },
 
-      fetchCompanyUsers(context){
-          return axios.get(process.env.VUE_APP_CardPortalSecurityApi_URL + '/api/companyusers',
+      fetchCompanyUsers(context,companyId){
+
+          return axios.get(process.env.VUE_APP_CardPortalSecurityApi_URL + '/api/companies/CompanyUsers/' + companyId,
               {
                   headers: {
                       "Content-Type": "application/json"
@@ -147,8 +158,8 @@ export default createStore({
               }
           )
       },
-      fetchCompanyActivities(context){
-          return axios.get(process.env.VUE_APP_CardPortalSecurityApi_URL + '/api/companyactivities',
+      fetchCompanyActivities(context,companyId){
+          return axios.get(process.env.VUE_APP_CardPortalSecurityApi_URL + '/api/companies/CompanyAcivities/'  + companyId,
               {
                   headers: {
                       "Content-Type": "application/json"
@@ -184,11 +195,33 @@ export default createStore({
           )
       },
 
-      getClientDashboardData(context,clientId){
+      fetchCompanyPendingApproval(context,companyId){
+        return axios.get(process.env.VUE_APP_CardPortalOperations_URL + `/api/CardRequest/pendingApproval/${companyId}`,
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        )
+    },
+
+    fetchCompanyPendingAcknowledgement(context,companyId){
+      return axios.get(process.env.VUE_APP_CardPortalOperations_URL + `/api/CardRequest/pendingacknowledgement/${companyId}`,
+          {
+              headers: {
+                  "Content-Type": "application/json"
+              }
+          }
+      )
+  },
+
+      getClientDashboardData(context,companyId){
         return Promise.all([
-            context.dispatch("fetchCompanyUsers"),
-            context.dispatch("fetchCompanyActivities"),
-            context.dispatch("fetchCompanyCardRequests",clientId),
+            context.dispatch("fetchCompanyUsers",companyId),
+            context.dispatch("fetchCompanyActivities",companyId),
+            context.dispatch("fetchCompanyCardRequests",companyId),
+            context.dispatch("fetchCompanyPendingApproval",companyId),
+            context.dispatch("fetchCompanyPendingAcknowledgement",companyId),
             context.dispatch("fetchRoles"),
         ]);
       }

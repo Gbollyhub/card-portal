@@ -42,24 +42,6 @@
             <div class="slide-card-icon purple"></div>
           </div>
         </div>
-        <div class="content-slide-box">
-          <div class="content-info-card">
-            <div class="div-block-2">
-              <div class="slide-card-header">User Requests</div>
-              <div class="slide-card-value">10,000</div>
-            </div>
-            <div class="slide-card-icon purple"></div>
-          </div>
-        </div>
-        <div class="content-slide-box">
-          <div class="content-info-card">
-            <div class="div-block-2">
-              <div class="slide-card-header">Card Requests</div>
-              <div class="slide-card-value">40,000</div>
-            </div>
-            <div class="slide-card-icon purple"></div>
-          </div>
-        </div>
       </div>
       <div class="basic-table-card">
         <div class="table-header">
@@ -80,7 +62,7 @@
              <tr v-for="(result, index) in getAdminUsers" :key="index" class="app-table-row">
                                     <td class="app-table-data">{{result.id}}</td>
                                   <td class="app-table-data">{{result.userName}}</td>
-                                      <td class="app-table-data"> {{result.rolesId}} </td>
+                                      <!-- <td class="app-table-data"> {{result.rolesId}} </td> -->
                          
                                   </tr>    
 
