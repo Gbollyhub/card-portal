@@ -81,7 +81,7 @@ export default {
   },
   computed: {
     activities_computed: function () {
-      return this.companyActivities.filter((ca)=>{ return ca.companyId === 1}).map((ca)=>{
+      return this.companyActivities.map((ca)=>{
         let activity = this.activities.find((a)=>{return ca.activitiesId === a.id});
         return {
           title : activity.name,

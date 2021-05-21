@@ -146,12 +146,20 @@ export default {
   computed:{
     users_list_computed:function (){
       return this.users_list.slice(0,this.users_list_sample_count).map((user)=>{
+        let role = this.roles.find((entry)=>{return user.rolesId === entry.id});
+        try {
+          role = role.name;
+        }catch (e){
+          console.log(e);
+          role = "";
+        }
+        role =  role.name;
         return {
           id : user.id,
           displayName : `${user.firstName} ${user.lastName}`,
           email : user.emailAddress,
           tel : user.mobileNo,
-          role : this.roles.find((entry)=>{return user.rolesId === entry.id}).name,
+          role : role,
           status : user.isActive
         }
       });

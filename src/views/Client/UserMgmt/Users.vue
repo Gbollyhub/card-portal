@@ -110,7 +110,7 @@ export default {
           userName : `${user.userName}`,
           email : user.emailAddress,
           tel : user.mobileNo,
-          role : this.roles.find((entry)=>{return user.rolesId === entry.id}).name,
+          role : "",//this.roles.find((entry)=>{return user.rolesId === entry.id}).name,
           status : user.isActive
         }
       });
