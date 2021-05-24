@@ -126,7 +126,7 @@ export default {
        closeAddReload(){
            this.AddUserModal = false
            location.reload();
-         return false; 
+         return false;
        },
         openAdd(){
            this.AddUserModal = true

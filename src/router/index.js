@@ -37,7 +37,7 @@ const routes = [
     path: '/client/login',
     name: 'Login',
     component: Login,
-    meta: { requiresMfbGuest: true }
+    //meta: { requiresMfbGuest: true }
   },
   {
     path: '/client/overview',
